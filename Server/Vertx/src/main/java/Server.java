@@ -22,7 +22,7 @@ public class Server extends AbstractVerticle {
 
 	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	Calendar cal = Calendar.getInstance();
-	
+
 	HashMap<String, Integer> KeyStore1 = new HashMap<String, Integer>();
 
 	@Override
@@ -49,44 +49,62 @@ public class Server extends AbstractVerticle {
 					if (key.startsWith("q1")) {
 						response = doQ1(key);
 					} else if (key.startsWith("q2")) {
-						response =doQ2(key);
+						response = doQ2(key);
 					} else if (key.startsWith("q3")) {
-						response =doQ3(key);
+						response = doQ3(key);
 					} else if (key.startsWith("q4")) {
-						response =doQ4(key);
+						response = doQ4(key);
 					} else if (key.startsWith("q5")) {
 						// with in memory
 						// response = String.valueOf(q5list.getCount(key));
 						// with mysql
 						response = doQ5(key);
 					} else if (key.startsWith("q6")) {
-						response = doQ6(key);
+						Thread t = new Thread(new Runnable() {
+
+							@Override
+							public void run() {
+								String response = "";
+								response = doQ6(key);
+								req.response()
+										.putHeader("content-type",
+												"text/html; charset=UTF-8")
+										.end(response);
+
+							}
+
+						});
+						t.start();
+
 					}
 				}
 
-				req.response()
-						.putHeader("content-type", "text/html; charset=UTF-8")
-						.end(response);
-				
+				if (!key.startsWith("q6")) {
+
+					req.response()
+							.putHeader("content-type",
+									"text/html; charset=UTF-8").end(response);
+				}
+
 			}).listen(8080);
 	}
 
 	private String doQ6(String key) {
 		String response = "";
 		response = jdbc.query(key);
-		return teamId + response.replace("$fuck$", "\n") ;
+		return teamId + response.replace("$fuck$", "\n");
 	}
 
 	private String doQ5(String key) {
 		String response = "";
-		response = jdbc.query(key);	
+		response = jdbc.query(key);
 		// build result according to key
-		return teamId + response+";";
+		return teamId + response + ";";
 	}
 
 	private String doQ4(String key) {
 		String response = "";
-		response = jdbc.query(key);	
+		response = jdbc.query(key);
 		return teamId + response.replace("$fuck$", "\n");
 	}
 
@@ -101,7 +119,7 @@ public class Server extends AbstractVerticle {
 		response = jdbc.query(key);
 		return teamId + response.replace("$fuck$", "\n") + ";";
 	}
-	
+
 	private String doQ1(String key) {
 		return teamId + key.substring(3);
 	}
@@ -109,8 +127,6 @@ public class Server extends AbstractVerticle {
 	/***************************************************************************
 	 * Parse Key and Build Result
 	 **************************************************************************/
-
-
 
 	/**
 	 * parse the request to generate the key in order to query in database
@@ -143,52 +159,50 @@ public class Server extends AbstractVerticle {
 		}
 		return "";
 	}
-	
+
 	public String parseQ6(String input) {
-		//q6?tid=1&opt=s
-		//q6?tid=1&seq=1&opt=a&tweetid=12312421312&tag=ILOVE15619!123
-		//q6?tid=1&seq=2&opt=r&tweetid=12312421312
-		//q6?tid=1&opt=e
-		
-		//q6,tid,opt,.....
-		//q6,1,s
-		//q6,1,a,1,12312421312,ILOVE15619!123
-		//q6,1,r,2,12312421312
-		//q6,1,e
+		// q6?tid=1&opt=s
+		// q6?tid=1&seq=1&opt=a&tweetid=12312421312&tag=ILOVE15619!123
+		// q6?tid=1&seq=2&opt=r&tweetid=12312421312
+		// q6?tid=1&opt=e
+
+		// q6,tid,opt,.....
+		// q6,1,s
+		// q6,1,a,1,12312421312,ILOVE15619!123
+		// q6,1,r,2,12312421312
+		// q6,1,e
 		int optIndex = input.indexOf("&opt=");
 		int tidIndex = input.indexOf("q6?tid=");
-		String opt = input.substring(optIndex+5,optIndex+6);
-		if(opt.equals("s")){
-			//start
-			String tid = input.substring(tidIndex+7, optIndex);
-			return "q6,"+tid+",s";
-		}else if(opt.equals("e")){
+		String opt = input.substring(optIndex + 5, optIndex + 6);
+		if (opt.equals("s")) {
+			// start
+			String tid = input.substring(tidIndex + 7, optIndex);
+			return "q6," + tid + ",s";
+		} else if (opt.equals("e")) {
 			// end
-			String tid = input.substring(tidIndex+7, optIndex);
-			return "q6,"+tid+",e";
-		}else if(opt.equals("r")){
-			//read
+			String tid = input.substring(tidIndex + 7, optIndex);
+			return "q6," + tid + ",e";
+		} else if (opt.equals("r")) {
+			// read
 			int segIndex = input.indexOf("&seq=");
 			int tweetidInde = input.indexOf("&tweetid=");
-			String tid = input.substring(tidIndex+7, segIndex);
-			String seg = input.substring(segIndex+5, optIndex);
-			String tweetId = input.substring(tweetidInde+9);
-			return "q6,"+tid+",r,"+seg+","+tweetId;
-		}else{
+			String tid = input.substring(tidIndex + 7, segIndex);
+			String seg = input.substring(segIndex + 5, optIndex);
+			String tweetId = input.substring(tweetidInde + 9);
+			return "q6," + tid + ",r," + seg + "," + tweetId;
+		} else {
 			// append
 			int segIndex = input.indexOf("&seq=");
 			int tweetidInde = input.indexOf("&tweetid=");
 			int tagIndex = input.indexOf("&tag=");
-			String tid = input.substring(tidIndex+7, segIndex);
-			String seg = input.substring(segIndex+5, optIndex);
-			String tweetId = input.substring(tweetidInde+9,tagIndex);
-			String tag = input.substring(tagIndex+5);
-			return "q6,"+tid+",a,"+seg+","+tweetId+",tag="+tag;		
+			String tid = input.substring(tidIndex + 7, segIndex);
+			String seg = input.substring(segIndex + 5, optIndex);
+			String tweetId = input.substring(tweetidInde + 9, tagIndex);
+			String tag = input.substring(tagIndex + 5);
+			return "q6," + tid + ",a," + seg + "," + tweetId + ",tag=" + tag;
 		}
 	}
 
-	
-	
 	private String parseQ5(String input) {
 		// q5?userid_min=u_id&userid_max=u_id
 		// q5,min,max
@@ -252,36 +266,36 @@ public class Server extends AbstractVerticle {
 	}
 
 	private String parseQ1(String input) {
-		
-			dateFormat.setTimeZone(TimeZone.getTimeZone("PRT"));
-			String put = dateFormat.format(cal.getTime()) + "\n";
 
-			int index = input.indexOf("&");
-			int keyIndex = input.indexOf("key");
-			if (index != -1 && keyIndex != -1) {
-				String message = input.substring(index + 9);
-				int l = message.length();
-				int n = (int) Math.sqrt(l);
+		dateFormat.setTimeZone(TimeZone.getTimeZone("PRT"));
+		String put = dateFormat.format(cal.getTime()) + "\n";
 
-				String xy = input.substring(keyIndex + 4, index);
-				int Z;
-				if (KeyStore1.containsKey(xy)) {
-					Z = KeyStore1.get(xy);
-				} else {
-					BigInteger XY = new BigInteger(xy);
-					String Y = XY.divide(X).toString();
-					Z = Integer.valueOf(Y.substring(Y.length() - 2)) % 25 + 1;
-					KeyStore1.put(xy, Z);
-				}
-				message = getText(message, n);
-				message = moveBit(message, Z);
-				return "q1," + put + message + "\n";
+		int index = input.indexOf("&");
+		int keyIndex = input.indexOf("key");
+		if (index != -1 && keyIndex != -1) {
+			String message = input.substring(index + 9);
+			int l = message.length();
+			int n = (int) Math.sqrt(l);
+
+			String xy = input.substring(keyIndex + 4, index);
+			int Z;
+			if (KeyStore1.containsKey(xy)) {
+				Z = KeyStore1.get(xy);
 			} else {
-				return "";
+				BigInteger XY = new BigInteger(xy);
+				String Y = XY.divide(X).toString();
+				Z = Integer.valueOf(Y.substring(Y.length() - 2)) % 25 + 1;
+				KeyStore1.put(xy, Z);
 			}
-		
+			message = getText(message, n);
+			message = moveBit(message, Z);
+			return "q1," + put + message + "\n";
+		} else {
+			return "";
+		}
+
 	}
-	
+
 	/********************************************************************
 	 * Q1 Helper Function
 	 ********************************************************************/
@@ -327,38 +341,38 @@ public class Server extends AbstractVerticle {
 		}
 		return builder.toString();
 	}
-	
-	public static UserCountList initializeQ5(String filename){
-		UserCountList list = new UserCountList();
-		
-		// round 2: read score list
-		BufferedReader reader = null;
-		long uid;
-		int sum;
-		int count = 0;
-		String line;
-		try {
-			reader = new BufferedReader(new FileReader(new File(filename)));
-			
-			while ((line = reader.readLine()) != null) {
-				count++;
-				if (count % 5000000 == 0) {
-				    System.out.print(count / 5000000 + " ");
-				}
-				String[] seg = line.split("\t");
-				if (seg.length != 3)
-					continue;
-				uid = Long.parseLong(seg[0]);
-				sum = Integer.parseInt(seg[1]);
-				list.add(uid, sum);
-			}
-			reader.close();
-		} catch (Exception e) {
-			System.out.print("Loading q5 file failed.");
-		}
 
-		
-		System.out.println("\nQ5: " + count + " loaded! (should be 53767998)");
-		return list;
-	}
+	// public static UserCountList initializeQ5(String filename){
+	// UserCountList list = new UserCountList();
+	//
+	// // round 2: read score list
+	// BufferedReader reader = null;
+	// long uid;
+	// int sum;
+	// int count = 0;
+	// String line;
+	// try {
+	// reader = new BufferedReader(new FileReader(new File(filename)));
+	//
+	// while ((line = reader.readLine()) != null) {
+	// count++;
+	// if (count % 5000000 == 0) {d
+	// System.out.print(count / 5000000 + " ");
+	// }
+	// String[] seg = line.split("\t");
+	// if (seg.length != 3)
+	// continue;
+	// uid = Long.parseLong(seg[0]);
+	// sum = Integer.parseInt(seg[1]);
+	// list.add(uid, sum);
+	// }
+	// reader.close();
+	// } catch (Exception e) {
+	// System.out.print("Loading q5 file failed.");
+	// }
+	//
+	//
+	// System.out.println("\nQ5: " + count + " loaded! (should be 53767998)");
+	// return list;
+	// }
 }

@@ -3,7 +3,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.PriorityQueue;
@@ -101,7 +100,7 @@ public class JDBCJava {
 		} else if (opt.equals("a")) {
 			Integer seq = Integer.parseInt(keys[2]);
 			String tweetid = keys[3];
-			String tag = key.substring(key.indexOf("tag="));
+			String tag = key.substring(key.indexOf("tag=") + 4);
 			return doAdd(tid, seq, tweetid, tag, "a");
 		} else if (opt.equals("r")) {
 			Integer seq = Integer.parseInt(keys[2]);
@@ -110,7 +109,6 @@ public class JDBCJava {
 		} else if (opt.equals("e")) {
 			return doEnd(tid);
 		}
-		
 		return null;
 	}
 
@@ -127,6 +125,7 @@ public class JDBCJava {
 	}
 
 	private String doRead(Integer tid, Integer seq, String tweetid, String opt) {
+		System.out.println("do Read");
 		PriorityQueue<MyRequest> q = transitMap.get(tid);
 		MyRequest newR = new MyRequest(seq, tweetid, null, opt);
 		String result;
@@ -138,12 +137,16 @@ public class JDBCJava {
 			while(r != newR || seqMap.get(tid) +1 != r.seq) {
 				try {
 					q.wait();
+					System.out.println("waik up!!!!!!");
+					System.out.println("seqNumber: " + seqMap.get(tid));
+					System.out.println("request seqNumber: " + r.seq);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				r = q.peek();
 			}
+			System.out.println("do read option!!!!");
 			
 			q.poll();
 			
@@ -167,8 +170,8 @@ public class JDBCJava {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			stmt = conn.createStatement();	
-			String sql = "UPDATE test6 SET post=" + result + "WHERE where tweetid=" + tweetid + ";";
-			stmt.executeQuery(sql);
+			String sql = "UPDATE test66 SET post='" + result + "' WHERE tweetid=" + tweetid + ";";
+			stmt.executeUpdate(sql);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -176,6 +179,7 @@ public class JDBCJava {
 	}
 
 	private String doAdd(Integer tid, Integer seq, String tweetid, String tag, String opt) {
+		System.out.println("do add");
 		PriorityQueue<MyRequest> q = transitMap.get(tid);
 		MyRequest newR = new MyRequest(seq, tweetid, tag, opt);
 		
@@ -183,7 +187,7 @@ public class JDBCJava {
 			q.add(newR);
 			
 			MyRequest r = q.peek();
-			while(r.opt.equals("a") && seqMap.get(tid) +1 == r.seq) {
+			while(r != null && r.opt.equals("a") && (seqMap.get(tid) +1 == r.seq)) {
 				q.poll();
 				
 				seqMap.put(tid, seqMap.get(tid) + 1);
@@ -192,12 +196,20 @@ public class JDBCJava {
 				if (tweetMap.containsKey(r.tweetid)) {
 					tweetMap.put(tweetid, tweetMap.get(tweetid) + r.tag);
 				} else {
-					tweetMap.put(tweetid, readFromMysql(tweetid));
+					String result = readFromMysql(tweetid);
+					tweetMap.put(tweetid, result + r.tag);
 				}
 				r = q.peek();
 			}
 			
-			if (q.peek().opt.equals("r")) {
+			if (q.peek() != null) {
+				for (MyRequest req : q) {
+					System.out.print(" req in queue: " + req.opt);
+					System.out.print(" req in queue: " + req.seq);
+					System.out.print(" req in queue: " + req.tweetid);
+					System.out.println("next seq number: " + seqMap.get(tid));
+					
+				}
 				q.notifyAll();
 			}
 			
@@ -207,35 +219,38 @@ public class JDBCJava {
 
 	private String readFromMysql(String tweetid) {
 		Statement stmt = null;
+		String result = "";
 
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			stmt = conn.createStatement();
-			String sql = "SELECT post from test6 where tweetid=" + tweetid + ";";
+			String sql = "SELECT post from test66 where tweetid=" + tweetid + ";";
 			ResultSet rs = stmt.executeQuery(sql);
 			
-			String result = null;
+			
 			while (rs.next()) {
 				result = rs.getString("post");
 			}
 			
 			if (result == null) {
 				result = "";
-				return result;
 			}
+			stmt.close();
+			rs.close();
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		return "";
+		return result;
 	}
 
 	private String doStart(Integer tid) {
 		transitMap.put(tid, new PriorityQueue<MyRequest>());
 		seqMap.put(tid, 0);
 		idMap.put(tid, new HashSet<String>());
-		return "";
+		return "0";
 	}
 
 	private String doQ3(String key) {
@@ -393,23 +408,25 @@ public class JDBCJava {
 		return sb.toString();
 	}
 	
-	
-	public class MyRequest implements Comparable<MyRequest>{
-		private String tweetid;
-		private int seq;
-		private String tag;
-		private String opt;
-		
-		public MyRequest(int seq, String tweetId, String tag, String opt) {
-			this.seq = seq;
-			this.tweetid = tweetId;
-			this.tag = tag;
-			this.opt = opt;
-		}
-	
-		@Override
-		public int compareTo(MyRequest o) {
-			return seq-o.seq;
-		}
+}
+
+class MyRequest implements Comparable<MyRequest> {
+	String tweetid;
+	int seq;
+	String tag;
+	String opt;
+
+	public MyRequest(int seq, String tweetId, String tag, String opt) {
+		this.seq = seq;
+		this.tweetid = tweetId;
+		this.tag = tag;
+		this.opt = opt;
+	}
+
+	@Override
+	public int compareTo(MyRequest o) {
+		return seq - o.seq;
 	}
 }
+
+
