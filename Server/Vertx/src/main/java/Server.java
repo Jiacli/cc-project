@@ -92,7 +92,7 @@ public class Server extends AbstractVerticle {
 	private String doQ6(String key) {
 		String response = "";
 		response = jdbc.query(key);
-		return teamId + response.replace("$fuck$", "\n");
+		return teamId + response.replace("$fuck$", "\n") + ";";
 	}
 
 	private String doQ5(String key) {
