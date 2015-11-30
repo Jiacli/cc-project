@@ -3,17 +3,16 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.PriorityQueue;
-
-import org.omg.CORBA.Request;
 
 public class JDBCJava {
 	// JDBC driver name and database URL
 	private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
 	private static final String DB_URL = "jdbc:mysql://localhost:3306/mydb";
 
-	
 	// Database credentials
 	private static final String USER = "root";
 	private static final String PASS = "123456";
@@ -26,6 +25,8 @@ public class JDBCJava {
 	// q6 variables for plan1
 	private HashMap <Integer, PriorityQueue<MyRequest>> transitMap = new HashMap<Integer, PriorityQueue<MyRequest>>();
 	private HashMap <String, String> tweetMap = new HashMap<String, String>();
+	private HashMap <Integer, Integer> seqMap = new HashMap<Integer, Integer>();
+	private HashMap <Integer, HashSet<String>> idMap = new HashMap<Integer, HashSet<String>>();
 
 	JDBCJava() throws SQLException {
 		conn = DriverManager.getConnection(DB_URL, USER, PASS);
@@ -91,7 +92,6 @@ public class JDBCJava {
 	}
 
 	private String doQ6(String key) {
-		Statement stmt = null;
 		key = key.substring(3);
 		String[] keys = key.split(",");
 		Integer tid = Integer.parseInt(keys[0]);
@@ -99,14 +99,14 @@ public class JDBCJava {
 		if (opt.equals("s")) {
 			return doStart(tid);
 		} else if (opt.equals("a")) {
-			String tweetid = keys[2];
-			String tag = keys[3];
-			return doAdd(tid, tweetid, tag);
-			
+			Integer seq = Integer.parseInt(keys[2]);
+			String tweetid = keys[3];
+			String tag = key.substring(key.indexOf("tag="));
+			return doAdd(tid, seq, tweetid, tag, "a");
 		} else if (opt.equals("r")) {
-			String tweetid = keys[2];
-			return doRead(tid, tweetid);
-			
+			Integer seq = Integer.parseInt(keys[2]);
+			String tweetid = keys[3];
+			return doRead(tid, seq, tweetid, "r");	
 		} else if (opt.equals("e")) {
 			return doEnd(tid);
 		}
@@ -115,26 +115,126 @@ public class JDBCJava {
 	}
 
 	private String doEnd( Integer tid) {
+		transitMap.remove(tid);
+		seqMap.remove(tid);
+		HashSet<String> idSet = idMap.remove(tid);
 		
-		return null;
+		for (String id : idSet) {
+			String post = tweetMap.remove(id);
+			writeIntoMysql(id, post);
+		}
+		return "0";
 	}
 
-	private String doRead(Integer tid, String tweetid) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private String doAdd(Integer tid, String tweetid, String tag) {
+	private String doRead(Integer tid, Integer seq, String tweetid, String opt) {
 		PriorityQueue<MyRequest> q = transitMap.get(tid);
-		MyRequest newR = new MyRequest(tid, tweetid);
+		MyRequest newR = new MyRequest(seq, tweetid, null, opt);
+		String result;
+		
+		synchronized(q) {
+			q.add(newR);
+			
+			MyRequest r = q.peek();
+			while(r != newR || seqMap.get(tid) +1 != r.seq) {
+				try {
+					q.wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				r = q.peek();
+			}
+			
+			q.poll();
+			
+			seqMap.put(tid, seqMap.get(tid) + 1);
+			idMap.get(tid).add(tweetid);
+			
+			if (tweetMap.containsKey(tweetid)) {
+				result = tweetMap.get(tweetid);
+			} else {
+				result = readFromMysql(tweetid);
+				tweetMap.put(tweetid, result);
+			}
+			q.notifyAll();
+		}
+		return result;
+	}
+
+	private void writeIntoMysql(String tweetid, String result) {
+		Statement stmt = null;
+		
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			stmt = conn.createStatement();	
+			String sql = "UPDATE test6 SET post=" + result + "WHERE where tweetid=" + tweetid + ";";
+			stmt.executeQuery(sql);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	private String doAdd(Integer tid, Integer seq, String tweetid, String tag, String opt) {
+		PriorityQueue<MyRequest> q = transitMap.get(tid);
+		MyRequest newR = new MyRequest(seq, tweetid, tag, opt);
+		
 		synchronized (q) {
+			q.add(newR);
+			
+			MyRequest r = q.peek();
+			while(r.opt.equals("a") && seqMap.get(tid) +1 == r.seq) {
+				q.poll();
+				
+				seqMap.put(tid, seqMap.get(tid) + 1);
+				idMap.get(tid).add(tweetid);
+				
+				if (tweetMap.containsKey(r.tweetid)) {
+					tweetMap.put(tweetid, tweetMap.get(tweetid) + r.tag);
+				} else {
+					tweetMap.put(tweetid, readFromMysql(tweetid));
+				}
+				r = q.peek();
+			}
+			
+			if (q.peek().opt.equals("r")) {
+				q.notifyAll();
+			}
 			
 		}
-		return null;
+		return newR.tag;
+	}
+
+	private String readFromMysql(String tweetid) {
+		Statement stmt = null;
+
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			stmt = conn.createStatement();
+			String sql = "SELECT post from test6 where tweetid=" + tweetid + ";";
+			ResultSet rs = stmt.executeQuery(sql);
+			
+			String result = null;
+			while (rs.next()) {
+				result = rs.getString("post");
+			}
+			
+			if (result == null) {
+				result = "";
+				return result;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return "";
 	}
 
 	private String doStart(Integer tid) {
 		transitMap.put(tid, new PriorityQueue<MyRequest>());
+		seqMap.put(tid, 0);
+		idMap.put(tid, new HashSet<String>());
 		return "";
 	}
 
@@ -295,15 +395,18 @@ public class JDBCJava {
 	
 	
 	public class MyRequest implements Comparable<MyRequest>{
-		private String id;
+		private String tweetid;
 		private int seq;
+		private String tag;
+		private String opt;
 		
-		public MyRequest(int seq, String tweetId) {
+		public MyRequest(int seq, String tweetId, String tag, String opt) {
 			this.seq = seq;
-			this.id = id;
+			this.tweetid = tweetId;
+			this.tag = tag;
+			this.opt = opt;
 		}
 	
-
 		@Override
 		public int compareTo(MyRequest o) {
 			return seq-o.seq;

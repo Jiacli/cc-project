@@ -56,8 +56,8 @@ public class Server extends AbstractVerticle {
 						response =doQ4(key);
 					} else if (key.startsWith("q5")) {
 						// with in memory
-						//response = String.valueOf(q5list.getCount(key));
-						 // with mysql
+						// response = String.valueOf(q5list.getCount(key));
+						// with mysql
 						response = doQ5(key);
 					} else if (key.startsWith("q6")) {
 						response = doQ6(key);
@@ -133,15 +133,12 @@ public class Server extends AbstractVerticle {
 
 		if (q1 != -1) {
 			return parseQ1(input);
-
 		} else if (q2 != -1) {
 			return parseQ2(input);
-
 		} else if (q3 != -1) {
 			return parseQ3(input);
 		} else if (q4 != -1) {
 			return parseQ4(input);
-
 		} else if (q5 != -1) {
 			return parseQ5(input);
 		} else if (q6 != -1) {
@@ -152,22 +149,22 @@ public class Server extends AbstractVerticle {
 
 	private String parseQ6(String input) {
 		// TODO Auto-generated method stub
-		//q6?tid=1&opt=s
-		//q6?tid=1&seq=1&opt=a&tweetid=12312421312&tag=ILOVE15619!123
-		//q6?tid=1&seq=2&opt=r&tweetid=12312421312
-		//q6?tid=1&opt=e
+		// q6?tid=1&opt=s
+		// q6?tid=1&seq=1&opt=a&tweetid=12312421312&tag=ILOVE15619!123
+		// q6?tid=1&seq=2&opt=r&tweetid=12312421312
+		// q6?tid=1&opt=e
 		
-		//q6,tid,opt,.....
-		//q6,1,s
-		//q6,1,a,1,12312421312,ILOVE15619!123
-		//q6,1,r,2,12312421312
-		//q6,1,e
+		// q6,tid,opt,.....
+		// q6,1,s
+		// q6,1,a,1,12312421312,ILOVE15619!123
+		// q6,1,r,2,12312421312
+		// q6,1,e
 		return null;
 	}
 
 	private String parseQ5(String input) {
 		// q5?userid_min=u_id&userid_max=u_id
-		//q5,min,max
+		// q5,min,max
 		int min = input.indexOf("userid_min=");
 		int max = input.indexOf("userid_max=");
 		if (min != -1 && max != -1) {
