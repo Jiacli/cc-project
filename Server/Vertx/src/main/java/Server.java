@@ -62,13 +62,12 @@ public class Server extends AbstractVerticle {
 					} else if (key.startsWith("q6")) {
 						response = doQ6(key);
 					}
-
 				}
 
 				req.response()
 						.putHeader("content-type", "text/html; charset=UTF-8")
 						.end(response);
-
+				
 			}).listen(8080);
 	}
 
@@ -80,16 +79,14 @@ public class Server extends AbstractVerticle {
 
 	private String doQ5(String key) {
 		String response = "";
-		response = jdbc.query(key);
-		
+		response = jdbc.query(key);	
 		// build result according to key
 		return teamId + response+";";
 	}
 
 	private String doQ4(String key) {
 		String response = "";
-		response = jdbc.query(key);
-		
+		response = jdbc.query(key);	
 		return teamId + response.replace("$fuck$", "\n");
 	}
 
@@ -146,22 +143,52 @@ public class Server extends AbstractVerticle {
 		}
 		return "";
 	}
-
-	private String parseQ6(String input) {
-		// TODO Auto-generated method stub
-		// q6?tid=1&opt=s
-		// q6?tid=1&seq=1&opt=a&tweetid=12312421312&tag=ILOVE15619!123
-		// q6?tid=1&seq=2&opt=r&tweetid=12312421312
-		// q6?tid=1&opt=e
+	
+	public String parseQ6(String input) {
+		//q6?tid=1&opt=s
+		//q6?tid=1&seq=1&opt=a&tweetid=12312421312&tag=ILOVE15619!123
+		//q6?tid=1&seq=2&opt=r&tweetid=12312421312
+		//q6?tid=1&opt=e
 		
-		// q6,tid,opt,.....
-		// q6,1,s
-		// q6,1,a,1,12312421312,ILOVE15619!123
-		// q6,1,r,2,12312421312
-		// q6,1,e
-		return null;
+		//q6,tid,opt,.....
+		//q6,1,s
+		//q6,1,a,1,12312421312,ILOVE15619!123
+		//q6,1,r,2,12312421312
+		//q6,1,e
+		int optIndex = input.indexOf("&opt=");
+		int tidIndex = input.indexOf("q6?tid=");
+		String opt = input.substring(optIndex+5,optIndex+6);
+		if(opt.equals("s")){
+			//start
+			String tid = input.substring(tidIndex+7, optIndex);
+			return "q6,"+tid+",s";
+		}else if(opt.equals("e")){
+			// end
+			String tid = input.substring(tidIndex+7, optIndex);
+			return "q6,"+tid+",e";
+		}else if(opt.equals("r")){
+			//read
+			int segIndex = input.indexOf("&seq=");
+			int tweetidInde = input.indexOf("&tweetid=");
+			String tid = input.substring(tidIndex+7, segIndex);
+			String seg = input.substring(segIndex+5, optIndex);
+			String tweetId = input.substring(tweetidInde+9);
+			return "q6,"+tid+",r,"+seg+","+tweetId;
+		}else{
+			// append
+			int segIndex = input.indexOf("&seq=");
+			int tweetidInde = input.indexOf("&tweetid=");
+			int tagIndex = input.indexOf("&tag=");
+			String tid = input.substring(tidIndex+7, segIndex);
+			String seg = input.substring(segIndex+5, optIndex);
+			String tweetId = input.substring(tweetidInde+9,tagIndex);
+			String tag = input.substring(tagIndex+5);
+			return "q6,"+tid+",a,"+seg+","+tweetId+",tag="+tag;		
+		}
 	}
 
+	
+	
 	private String parseQ5(String input) {
 		// q5?userid_min=u_id&userid_max=u_id
 		// q5,min,max

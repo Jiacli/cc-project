@@ -27,7 +27,7 @@ public class Proxy extends AbstractVerticle {
 	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	Calendar cal = Calendar.getInstance();
 	HashMap<String, Integer> KeyStore1 = new HashMap<String, Integer>();
-	private static final int hostnum = 4;
+	private static final int hostnum = 10;
 	private static String[] DNS = new String[hostnum];
     private int count = 0;
 	
@@ -39,20 +39,27 @@ public class Proxy extends AbstractVerticle {
 		System.out.println("*********** start **************");
 		jdbc = new JDBCJava();
 		HttpClient client = vertx.createHttpClient(new HttpClientOptions());
-		DNS[0] = "ec2-54-164-72-85.compute-1.amazonaws.com";
-        DNS[1] = "ec2-54-173-80-246.compute-1.amazonaws.com";
-        DNS[2] = "ec2-54-152-122-249.compute-1.amazonaws.com";
-        DNS[3] = "ec2-54-152-224-210.compute-1.amazonaws.com";
+		DNS[0] = "ec2-52-91-188-25.compute-1.amazonaws.com";
+        DNS[1] = "ec2-52-91-103-204.compute-1.amazonaws.com";
+        DNS[2] = "ec2-52-91-234-233.compute-1.amazonaws.com";
+        DNS[3] = "ec2-52-23-206-253.compute-1.amazonaws.com";
+        DNS[4] = "ec2-54-152-32-146.compute-1.amazonaws.com";
+        DNS[5] = "ec2-54-84-225-132.compute-1.amazonaws.com";
+        DNS[6] = "ec2-54-165-88-70.compute-1.amazonaws.com";
+        DNS[7] = "ec2-54-165-176-21.compute-1.amazonaws.com";
+        DNS[8] = "ec2-54-152-14-32.compute-1.amazonaws.com";
+        DNS[9] = "ec2-52-91-17-7.compute-1.amazonaws.com";
 
 		// connection
 		HttpServer server = vertx.createHttpServer();
 		server.requestHandler(req -> {
 			String uri = req.uri();
 			if (uri.indexOf("q1") == -1 && uri.indexOf("q5") == -1) {
+				int dnsNum = getDnsNum(uri,count);
 				HttpClientRequest c_req = client.request(
                         req.method(),
                         80,
-                        DNS[count],
+                        DNS[dnsNum],
                         req.uri(),
                         c_res -> {
                             req.response().setChunked(true);
@@ -89,7 +96,6 @@ public class Proxy extends AbstractVerticle {
 					}
 					response = buildResult(response, key);
 				}
-
 				req.response()
 						.putHeader("content-type", "text/html; charset=UTF-8")
 						.end(response);
@@ -98,6 +104,30 @@ public class Proxy extends AbstractVerticle {
 			}).listen(8080);
 	}
 
+	/**
+	 * Get the dns num for q2-q4
+	 * @param uri
+	 * @param count
+	 * @return
+	 */
+	private int getDnsNum(String uri,int count){
+		int dnsNum = count;
+		if(uri.indexOf("q2")!=-1){
+			int idIndex = uri.indexOf("userid=");
+			int andIndex = uri.indexOf("&");
+			String userid = uri.substring(idIndex+7, andIndex);
+			dnsNum = userid.hashCode()%10;
+		}else if(uri.indexOf("q6")!=-1){
+			int idIndex = uri.indexOf("tweetid=");
+			int andIndex = uri.indexOf("&tag");
+			String tweetid = uri.substring(idIndex+8, andIndex);
+			dnsNum = tweetid.hashCode()%10;
+		}else{
+			dnsNum = count;
+		}
+		return dnsNum;
+	}
+	
 	/***************************************************************************
 	 * Parse Key and Build Result
 	 **************************************************************************/
