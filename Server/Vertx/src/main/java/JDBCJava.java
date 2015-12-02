@@ -111,24 +111,22 @@ public class JDBCJava {
 	}
 
 	private String doEnd( Integer tid) {
-		transitMap.remove(tid);
-		seqMap.remove(tid);
-		HashSet<String> idSet = idMap.remove(tid);
-		if(idSet == null){
-			return "0";
-		}
-		
-		for (String id : idSet) {
-			String post = tweetMap.remove(id);
-			writeIntoMysql(id, post);
-		}
+//		transitMap.remove(tid);
+//		seqMap.remove(tid);
+//		HashSet<String> idSet = idMap.remove(tid);
+//		if(idSet == null){
+//			return "0";
+//		}
+//		
+//		for (String id : idSet) {
+//			String post = tweetMap.remove(id);
+//			writeIntoMysql(id, post);
+//		}
 		return "0";
 	}
 
 	private String doRead(Integer tid, Integer seq, String tweetid, String opt) {
 		System.out.println("do Read");
-//		PriorityQueue<MyRequest> q = transitMap.get(tid);
-//		MyRequest newR = new MyRequest(seq, tweetid, null, opt);
 		String result;
 		
 		if (tweetMap.containsKey(tweetid)) {
@@ -137,38 +135,7 @@ public class JDBCJava {
 			result = readFromMysql(tweetid);
 			tweetMap.put(tweetid, result);
 		}
-		
-//		synchronized(q) {
-//			q.add(newR);
-//			
-//			MyRequest r = q.peek();
-//			while(r != newR ){//|| seqMap.get(tid) +1 != r.seq) {
-//				try {
-//					q.wait();
-//					System.out.println("waik up!!!!!!");
-//					System.out.println("seqNumber: " + seqMap.get(tid));
-//					System.out.println("request seqNumber: " + r.seq);
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				r = q.peek();
-//			}
-//			System.out.println("do read option!!!!");
-//			
-//			q.poll();
-//			
-//			seqMap.put(tid, seqMap.get(tid) + 1);
-//			idMap.get(tid).add(tweetid);
-//			
-//			if (tweetMap.containsKey(tweetid)) {
-//				result = tweetMap.get(tweetid);
-//			} else {
-//				result = readFromMysql(tweetid);
-//				tweetMap.put(tweetid, result);
-//			}
-//			q.notifyAll();
-//		}
+
 		return result;
 	}
 
@@ -188,40 +155,6 @@ public class JDBCJava {
 
 	private String doAdd(Integer tid, Integer seq, String tweetid, String tag, String opt) {
 		System.out.println("do add");
-//		PriorityQueue<MyRequest> q = transitMap.get(tid);
-//		MyRequest newR = new MyRequest(seq, tweetid, tag, opt);
-		
-//		synchronized (q) {
-//			q.add(newR);
-//			
-//			MyRequest r = q.peek();
-//			while(r != null && r.opt.equals("a")){ //&& (seqMap.get(tid) +1 == r.seq)) {
-//				q.poll();
-//				
-//				seqMap.put(tid, seqMap.get(tid) + 1);
-//				idMap.get(tid).add(tweetid);
-//				
-//				if (tweetMap.containsKey(r.tweetid)) {
-//					tweetMap.put(tweetid, tweetMap.get(tweetid) + r.tag);
-//				} else {
-//					String result = readFromMysql(tweetid);
-//					tweetMap.put(tweetid, result + r.tag);
-//				}
-//				r = q.peek();
-//			}
-//			
-//			if (q.peek() != null) {
-//				for (MyRequest req : q) {
-//					System.out.print(" req in queue: " + req.opt);
-//					System.out.print(" req in queue: " + req.seq);
-//					System.out.print(" req in queue: " + req.tweetid);
-//					System.out.println("next seq number: " + seqMap.get(tid));
-//					
-//				}
-//				q.notifyAll();
-//			}
-//			
-//		}
 		
 		if (tweetMap.containsKey(tweetid)) {
 			tweetMap.put(tweetid, tweetMap.get(tweetid) + tag);
@@ -263,9 +196,9 @@ public class JDBCJava {
 	}
 
 	private String doStart(Integer tid) {
-		transitMap.put(tid, new PriorityQueue<MyRequest>());
-		seqMap.put(tid, 0);
-		idMap.put(tid, new HashSet<String>());
+//		transitMap.put(tid, new PriorityQueue<MyRequest>());
+//		seqMap.put(tid, 0);
+//		idMap.put(tid, new HashSet<String>());
 		return "0";
 	}
 
