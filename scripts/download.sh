@@ -49,11 +49,5 @@ echo Q5 ALL done
 # download q6 data
 #############################
 cd /home/ubuntu/q6data
-counter=0
-while [ $counter -le  9 ]
-do
-    wget https://s3-us-west-2.amazonaws.com/dongdongdongdong/q6/q6new-$counter.csv
-    ((counter++))
-done
-
+wget https://s3-us-west-2.amazonaws.com/dongdongdongdong/q6/q6new-0.csv
 echo Q6 ALL done
