@@ -68,7 +68,7 @@ sudo mysql --local-infile -uroot -p123456 mydb -e "use mydb" -e "
         echo "$f finish" 
 done
 
-sudo mysql --local-infile -uroot -p123456 mydb -e "use mydb" -e "CREATE INDEX idIndex ON test5 (userid,nextid);"
+sudo mysql --local-infile -uroot -p123456 mydb -e "use mydb" -e "CREATE INDEX idIndex ON test5 (userid);"
 echo create index q5 finish
 
 echo finishQ5
