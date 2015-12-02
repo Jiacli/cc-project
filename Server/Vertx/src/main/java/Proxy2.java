@@ -183,14 +183,14 @@ public class Proxy2 extends AbstractVerticle {
 
 			String xy = input.substring(keyIndex + 4, index);
 			int Z;
-			if (KeyStore1.containsKey(xy)) {
-				Z = KeyStore1.get(xy);
-			} else {
+//			if (KeyStore1.containsKey(xy)) {
+//				Z = KeyStore1.get(xy);
+//			} else {
 				BigInteger XY = new BigInteger(xy);
 				String Y = XY.divide(X).toString();
 				Z = Integer.valueOf(Y.substring(Y.length() - 2)) % 25 + 1;
-				KeyStore1.put(xy, Z);
-			}
+//				KeyStore1.put(xy, Z);
+//			}
 			message = getText(message, n);
 			message = moveBit(message, Z);
 			return "q1," + put + message + "\n";
