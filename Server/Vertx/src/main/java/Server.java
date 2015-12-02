@@ -26,7 +26,7 @@ public class Server extends AbstractVerticle {
 	HashMap<String, Integer> KeyStore1 = new HashMap<String, Integer>();
 	
 	// q5 in mem-cache
-	private static UserCountList q5list = initializeQ5("/home/ubuntu/q5data/q5merge.csv");
+//	private static UserCountList q5list = initializeQ5("/home/ubuntu/q5data/q5merge.csv");
 
 	@Override
 	public void start() throws Exception {
@@ -59,9 +59,9 @@ public class Server extends AbstractVerticle {
 						response = doQ4(key);
 					} else if (key.startsWith("q5")) {
 						// with in memory
-						 response = teamId + String.valueOf(q5list.getCount(key)) + ";";
+//						 response = teamId + String.valueOf(q5list.getCount(key)) + ";";
 						// with mysql
-//						response = doQ5(key);
+						response = doQ5(key);
 					} else if (key.startsWith("q6")) {
 						Thread t = new Thread(new Runnable() {
 
