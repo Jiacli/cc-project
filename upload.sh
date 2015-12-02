@@ -14,9 +14,11 @@
 # scp -i /Users/ZhangYC/Desktop/Study/F15/15619/project/teamProject/teamproject.pem /Users/ZhangYC/Desktop/Study/F15/15619/project/phase3/cc-project/Server/Vertx/src/main/java/* ubuntu@ec2-54-152-122-249.compute-1.amazonaws.com:/home/ubuntu/server
 # scp -i /Users/ZhangYC/Desktop/Study/F15/15619/project/teamProject/teamproject.pem /Users/ZhangYC/Desktop/Study/F15/15619/project/phase3/cc-project/scripts/* ubuntu@ec2-54-152-122-249.compute-1.amazonaws.com:/home/ubuntu/scripts/
 
-scp -i /Users/ZhangYC/Desktop/Study/F15/15619/qq.pem /Users/ZhangYC/Desktop/Study/F15/15619/project/phase3/cc-project/Server/Vertx/src/main/java/* ubuntu@ec2-52-91-13-255.compute-1.amazonaws.com:/home/ubuntu/server
-scp -i /Users/ZhangYC/Desktop/Study/F15/15619/qq.pem /Users/ZhangYC/Desktop/Study/F15/15619/project/phase3/cc-project/Server/Vertx/src/main/java/* ubuntu@ec2-54-84-34-178.compute-1.amazonaws.com:/home/ubuntu/server
-scp -i /Users/ZhangYC/Desktop/Study/F15/15619/qq.pem /Users/ZhangYC/Desktop/Study/F15/15619/project/phase3/cc-project/Server/Vertx/src/main/java/* ubuntu@ec2-54-175-20-116.compute-1.amazonaws.com:/home/ubuntu/server
-scp -i /Users/ZhangYC/Desktop/Study/F15/15619/qq.pem /Users/ZhangYC/Desktop/Study/F15/15619/project/phase3/cc-project/Server/Vertx/src/main/java/* ubuntu@ec2-54-172-16-155.compute-1.amazonaws.com:/home/ubuntu/server
-scp -i /Users/ZhangYC/Desktop/Study/F15/15619/qq.pem /Users/ZhangYC/Desktop/Study/F15/15619/project/phase3/cc-project/Server/Vertx/src/main/java/* ubuntu@ec2-54-86-232-154.compute-1.amazonaws.com:/home/ubuntu/server
+# scp -i /Users/ZhangYC/Desktop/Study/F15/15619/qq.pem /Users/ZhangYC/Desktop/Study/F15/15619/project/phase3/cc-project/Server/Vertx/src/main/java/* ubuntu@ec2-52-91-13-255.compute-1.amazonaws.com:/home/ubuntu/server
+# scp -i /Users/ZhangYC/Desktop/Study/F15/15619/qq.pem /Users/ZhangYC/Desktop/Study/F15/15619/project/phase3/cc-project/Server/Vertx/src/main/java/* ubuntu@ec2-54-84-34-178.compute-1.amazonaws.com:/home/ubuntu/server
+# scp -i /Users/ZhangYC/Desktop/Study/F15/15619/qq.pem /Users/ZhangYC/Desktop/Study/F15/15619/project/phase3/cc-project/Server/Vertx/src/main/java/* ubuntu@ec2-54-175-20-116.compute-1.amazonaws.com:/home/ubuntu/server
+# scp -i /Users/ZhangYC/Desktop/Study/F15/15619/qq.pem /Users/ZhangYC/Desktop/Study/F15/15619/project/phase3/cc-project/Server/Vertx/src/main/java/* ubuntu@ec2-54-172-16-155.compute-1.amazonaws.com:/home/ubuntu/server
+# scp -i /Users/ZhangYC/Desktop/Study/F15/15619/qq.pem /Users/ZhangYC/Desktop/Study/F15/15619/project/phase3/cc-project/Server/Vertx/src/main/java/* ubuntu@ec2-54-86-232-154.compute-1.amazonaws.com:/home/ubuntu/server
+scp -i /Users/ZhangYC/Desktop/Study/F15/15619/qq.pem /Users/ZhangYC/Desktop/Study/F15/15619/project/phase3/cc-project/Server/Vertx/src/main/java/* ubuntu@ec2-52-91-255-235.compute-1.amazonaws.com:/home/ubuntu/server
+
 #scp -i /Users/ZhangYC/Desktop/Study/F15/15619/dongdong.pem /Users/ZhangYC/Desktop/Study/F15/15619/project/phase3/cc-project/scripts/* ubuntu@ec2-52-91-188-25.compute-1.amazonaws.com:/home/ubuntu/scripts/

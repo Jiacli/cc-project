@@ -63,31 +63,31 @@ public class Server extends AbstractVerticle {
 						// with mysql
 						response = doQ5(key);
 					} else if (key.startsWith("q6")) {
-						Thread t = new Thread(new Runnable() {
+						//Thread t = new Thread(new Runnable() {
 
-							@Override
-							public void run() {
-								String response = "";
+//							@Override
+//							public void run() {
+								//String response = "";
 								response = doQ6(key);
-								req.response()
-										.putHeader("content-type",
-												"text/html; charset=UTF-8")
-										.end(response);
+//								req.response()
+//										.putHeader("content-type",
+//												"text/html; charset=UTF-8")
+//										.end(response);
 
-							}
+							//}
 
-						});
-						t.start();
+						//});
+						//t.start();
 
 					}
 				}
 
-				if (!key.startsWith("q6")) {
+				//if (!key.startsWith("q6")) {
 
 					req.response()
 							.putHeader("content-type",
 									"text/html; charset=UTF-8").end(response);
-				}
+				//}
 
 			}).listen(8080);
 	}
