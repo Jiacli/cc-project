@@ -142,24 +142,24 @@ public class Server extends AbstractVerticle {
 	 */
 	public String getQueryKey(String input) {
 
-		int q1 = input.indexOf("q1?");
-		int q2 = input.indexOf("q2?");
-		int q3 = input.indexOf("q3?");
-		int q4 = input.indexOf("q4?");
-		int q5 = input.indexOf("q5?");
-		int q6 = input.indexOf("q6?");
+//		int q1 = input.indexOf("q1?");
+//		int q2 = input.indexOf("q2?");
+//		int q3 = input.indexOf("q3?");
+//		int q4 = input.indexOf("q4?");
+//		int q5 = input.indexOf("q5?");
+//		int q6 = input.indexOf("q6?");
 
-		if (q1 != -1) {
+		if (input.startsWith("/q1?")) {
 			return parseQ1(input);
-		} else if (q2 != -1) {
+		} else if (input.startsWith("/q2?")) {
 			return parseQ2(input);
-		} else if (q3 != -1) {
+		} else if (input.startsWith("/q3?")) {
 			return parseQ3(input);
-		} else if (q4 != -1) {
+		} else if (input.startsWith("/q4?")) {
 			return parseQ4(input);
-		} else if (q5 != -1) {
+		} else if (input.startsWith("/q5?")) {
 			return parseQ5(input);
-		} else if (q6 != -1) {
+		} else if (input.startsWith("/q6?")) {
 			return parseQ6(input);
 		}
 		return "";
