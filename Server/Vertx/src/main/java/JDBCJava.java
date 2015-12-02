@@ -111,17 +111,17 @@ public class JDBCJava {
 	}
 
 	private String doEnd( Integer tid) {
-//		transitMap.remove(tid);
-//		seqMap.remove(tid);
-//		HashSet<String> idSet = idMap.remove(tid);
-//		if(idSet == null){
-//			return "0";
-//		}
-//		
-//		for (String id : idSet) {
-//			String post = tweetMap.remove(id);
-//			writeIntoMysql(id, post);
-//		}
+		transitMap.remove(tid);
+		seqMap.remove(tid);
+		HashSet<String> idSet = idMap.remove(tid);
+		if(idSet == null){
+			return "0";
+		}
+		
+		for (String id : idSet) {
+			String post = tweetMap.remove(id);
+			writeIntoMysql(id, post);
+		}
 		return "0";
 	}
 
@@ -135,7 +135,8 @@ public class JDBCJava {
 			result = readFromMysql(tweetid);
 			tweetMap.put(tweetid, result);
 		}
-
+		System.out.println("do read finish");
+		System.out.println(result);
 		return result;
 	}
 
@@ -196,9 +197,9 @@ public class JDBCJava {
 	}
 
 	private String doStart(Integer tid) {
-//		transitMap.put(tid, new PriorityQueue<MyRequest>());
-//		seqMap.put(tid, 0);
-//		idMap.put(tid, new HashSet<String>());
+		transitMap.put(tid, new PriorityQueue<MyRequest>());
+		seqMap.put(tid, 0);
+		idMap.put(tid, new HashSet<String>());
 		return "0";
 	}
 
