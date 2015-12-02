@@ -33,23 +33,23 @@ public class JDBCJava {
 
 	public String query(String key) {
 
-		int q1 = key.indexOf("q1");
-		int q2 = key.indexOf("q2");
-		int q3 = key.indexOf("q3");
-		int q4 = key.indexOf("q4");
-		int q5 = key.indexOf("q5");
-		int q6 = key.indexOf("q6");
+//		int q1 = key.indexOf("q1");
+//		int q2 = key.indexOf("q2");
+//		int q3 = key.indexOf("q3");
+//		int q4 = key.indexOf("q4");
+//		int q5 = key.indexOf("q5");
+//		int q6 = key.indexOf("q6");
 
 		// do query
-		if (q2 != -1) {
+		if (key.startsWith("q2,")) {
 			return doQ2(key);
-		} else if (q3 != -1) {
+		} else if (key.startsWith("q3,")) {
 			return doQ3(key);
-		} else if (q4 != -1) {
+		} else if (key.startsWith("q4,")) {
 			return doQ4(key);
-		} else if (q5 != -1) {
+		} else if (key.startsWith("q5,")) {
 			return doQ5(key);
-		} else if (q6 != -1) {
+		} else if (key.startsWith("q6,")) {
 			return doQ6(key);
 		}
 		return "shouldn't goes here!";
