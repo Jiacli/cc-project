@@ -24,9 +24,10 @@ public class Server extends AbstractVerticle {
 	Calendar cal = Calendar.getInstance();
 
 	HashMap<String, Integer> KeyStore1 = new HashMap<String, Integer>();
-	
+
 	// q5 in mem-cache
-//	private static UserCountList q5list = initializeQ5("/home/ubuntu/q5data/q5merge.csv");
+	// private static UserCountList q5list =
+	// initializeQ5("/home/ubuntu/q5data/q5merge.csv");
 
 	@Override
 	public void start() throws Exception {
@@ -59,35 +60,36 @@ public class Server extends AbstractVerticle {
 						response = doQ4(key);
 					} else if (key.startsWith("q5")) {
 						// with in memory
-//						 response = teamId + String.valueOf(q5list.getCount(key)) + ";";
+						// response = teamId +
+						// String.valueOf(q5list.getCount(key)) + ";";
 						// with mysql
 						response = doQ5(key);
 					} else if (key.startsWith("q6")) {
-						//Thread t = new Thread(new Runnable() {
+						// Thread t = new Thread(new Runnable() {
 
-//							@Override
-//							public void run() {
-								//String response = "";
-								response = doQ6(key);
-//								req.response()
-//										.putHeader("content-type",
-//												"text/html; charset=UTF-8")
-//										.end(response);
+						// @Override
+						// public void run() {
+						// String response = "";
+						response = doQ6(key);
+						// req.response()
+						// .putHeader("content-type",
+						// "text/html; charset=UTF-8")
+						// .end(response);
 
-							//}
+						// }
 
-						//});
-						//t.start();
+						// });
+						// t.start();
 
 					}
 				}
 
-				//if (!key.startsWith("q6")) {
+				// if (!key.startsWith("q6")) {
 
-					req.response()
-							.putHeader("content-type",
-									"text/html; charset=UTF-8").end(response);
-				//}
+				req.response()
+						.putHeader("content-type", "text/html; charset=UTF-8")
+						.end(response);
+				// }
 
 			}).listen(8080);
 	}
@@ -140,12 +142,12 @@ public class Server extends AbstractVerticle {
 	 */
 	public String getQueryKey(String input) {
 
-		int q1 = input.indexOf("q1");
-		int q2 = input.indexOf("q2");
-		int q3 = input.indexOf("q3");
-		int q4 = input.indexOf("q4");
-		int q5 = input.indexOf("q5");
-		int q6 = input.indexOf("q6");
+		int q1 = input.indexOf("q1?");
+		int q2 = input.indexOf("q2?");
+		int q3 = input.indexOf("q3?");
+		int q4 = input.indexOf("q4?");
+		int q5 = input.indexOf("q5?");
+		int q6 = input.indexOf("q6?");
 
 		if (q1 != -1) {
 			return parseQ1(input);
@@ -345,9 +347,9 @@ public class Server extends AbstractVerticle {
 		return builder.toString();
 	}
 
-	public static UserCountList initializeQ5(String filename){
+	public static UserCountList initializeQ5(String filename) {
 		UserCountList list = new UserCountList();
-		
+
 		// round 2: read score list
 		BufferedReader reader = null;
 		long uid;
@@ -356,11 +358,11 @@ public class Server extends AbstractVerticle {
 		String line;
 		try {
 			reader = new BufferedReader(new FileReader(new File(filename)));
-			
+
 			while ((line = reader.readLine()) != null) {
 				count++;
 				if (count % 5000000 == 0) {
-				    System.out.print(count / 5000000 + " ");
+					System.out.print(count / 5000000 + " ");
 				}
 				String[] seg = line.split("\t");
 				if (seg.length != 3)
@@ -374,7 +376,6 @@ public class Server extends AbstractVerticle {
 			System.out.print("Loading q5 file failed.");
 		}
 
-		
 		System.out.println("\nQ5: " + count + " loaded! (should be 53767998)");
 		return list;
 	}
@@ -387,27 +388,28 @@ class UserCountList {
 	private int[] id = null;
 	private int[] count = null;
 	private int size = 0;
-	private static final int TOTAL = 53767998+1;
+	private static final int TOTAL = 53767998 + 1;
 	private static final long MINID = 12;
 	private static final long MAXID = 2594997268L;
 	private final int UID_SHIFT = 1000000000;
 
-	public UserCountList(){
+	public UserCountList() {
 		id = new int[TOTAL];
 		count = new int[TOTAL];
 		id[0] = 0;
 		count[0] = 0;
 		size++;
 	}
-	
-	public void add(long uid, int sum){
-		int newid = (int)(uid-UID_SHIFT);
+
+	public void add(long uid, int sum) {
+		int newid = (int) (uid - UID_SHIFT);
 		id[size] = newid;
 		count[size] = sum;
 		size++;
 	}
-	
-	private int binSearchUidLeft(int[] array, int target, int beginPos, int endPos) {
+
+	private int binSearchUidLeft(int[] array, int target, int beginPos,
+			int endPos) {
 		// [...)
 		while (1 < endPos - beginPos) {
 			int mid = (beginPos + endPos) / 2;
@@ -422,9 +424,9 @@ class UserCountList {
 		} else {
 			return beginPos;
 		}
-					
+
 	}
-	
+
 	private int binSearchUid(int[] array, int target, int beginPos, int endPos) {
 		// [...)
 		while (1 < endPos - beginPos) {
@@ -435,27 +437,27 @@ class UserCountList {
 				beginPos = mid;
 			}
 		}
-		return beginPos;			
+		return beginPos;
 	}
-	
+
 	public int getCount(String q5str) {
 		String[] seg = q5str.split(",");
-		
+
 		long left = Long.parseLong(seg[1]);
 		long right = Long.parseLong(seg[2]);
-		
+
 		return search(left, right);
 	}
-	
+
 	private int search(long left, long right) {
-		if(left < MINID){
+		if (left < MINID) {
 			left = MINID;
 		}
-		if(right > MAXID){
+		if (right > MAXID) {
 			right = MAXID;
-		}			
-		int leftpos = binSearchUidLeft(id, (int)(left - UID_SHIFT), 1, TOTAL);
-		int rightpos = binSearchUid(id, (int)(right - UID_SHIFT), 1, TOTAL);
+		}
+		int leftpos = binSearchUidLeft(id, (int) (left - UID_SHIFT), 1, TOTAL);
+		int rightpos = binSearchUid(id, (int) (right - UID_SHIFT), 1, TOTAL);
 		return count[rightpos] - count[leftpos];
 	}
 }

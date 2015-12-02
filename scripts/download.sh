@@ -42,9 +42,6 @@ echo Q4 ALL done
 cd /home/ubuntu/q5data
 wget https://s3.amazonaws.com/mizhangteamproject/q5merge.csv
 echo Q5 ALL done
-
-
-
 #############################
 # download q6 data
 #############################

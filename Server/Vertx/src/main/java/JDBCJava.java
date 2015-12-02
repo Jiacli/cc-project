@@ -126,7 +126,6 @@ public class JDBCJava {
 	}
 
 	private String doRead(Integer tid, Integer seq, String tweetid, String opt) {
-		System.out.println("do Read");
 		String result;
 		
 		if (tweetMap.containsKey(tweetid)) {
@@ -135,8 +134,6 @@ public class JDBCJava {
 			result = readFromMysql(tweetid);
 			tweetMap.put(tweetid, result);
 		}
-		System.out.println("do read finish");
-		System.out.println(result);
 		return result;
 	}
 
@@ -155,7 +152,6 @@ public class JDBCJava {
 	}
 
 	private String doAdd(Integer tid, Integer seq, String tweetid, String tag, String opt) {
-		System.out.println("do add");
 		
 		if (tweetMap.containsKey(tweetid)) {
 			tweetMap.put(tweetid, tweetMap.get(tweetid) + tag);
