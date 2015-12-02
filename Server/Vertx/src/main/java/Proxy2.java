@@ -35,7 +35,7 @@ public class Proxy2 extends AbstractVerticle {
 	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	Calendar cal = Calendar.getInstance();
 	HashMap<String, Integer> KeyStore1 = new HashMap<String, Integer>();
-	private static final int hostnum = 10;
+	private static final int hostnum = 5;
 	private static final int q5host = 10;
 	private static String[] DNS = new String[hostnum+1];
 	private int count = 0;
@@ -50,20 +50,20 @@ public class Proxy2 extends AbstractVerticle {
 		DNS[2] = "ec2-52-91-16-220.compute-1.amazonaws.com";
 		DNS[3] = "ec2-54-175-199-40.compute-1.amazonaws.com";
 		DNS[4] = "ec2-54-86-84-148.compute-1.amazonaws.com";
-		DNS[5] = "ec2-52-91-13-255.compute-1.amazonaws.com";
-		DNS[6] = "ec2-54-84-34-178.compute-1.amazonaws.com";
-		DNS[7] = "ec2-54-175-20-116.compute-1.amazonaws.com";
-		DNS[8] = "ec2-54-172-16-155.compute-1.amazonaws.com";
-		DNS[9] = "ec2-54-86-232-154.compute-1.amazonaws.com";
+//		DNS[5] = "ec2-52-91-13-255.compute-1.amazonaws.com";
+//		DNS[6] = "ec2-54-84-34-178.compute-1.amazonaws.com";
+//		DNS[7] = "ec2-54-175-20-116.compute-1.amazonaws.com";
+//		DNS[8] = "ec2-54-172-16-155.compute-1.amazonaws.com";
+//		DNS[9] = "ec2-54-86-232-154.compute-1.amazonaws.com";
 		
 		//q5 host
-		DNS[10] = "ec2-52-91-70-44.compute-1.amazonaws.com";
+//		DNS[10] = "ec2-52-91-70-44.compute-1.amazonaws.com";
 
 		// connection
 		HttpServer server = vertx.createHttpServer();
 		server.requestHandler(req -> {
 				String uri = req.uri();
-				if (uri.indexOf("q1") == -1) {
+				if (uri.indexOf("/q1?") == -1) {
 					int dnsNum = getDnsNum(uri, count);
 					// dnsNum == 50 means illegal, ignore illegal request
 					if (dnsNum != 50) {
@@ -100,7 +100,11 @@ public class Proxy2 extends AbstractVerticle {
 			} else {	
 				// parse and get q1
 				String key = getQueryKey(uri);
-				String response =  teamId + key.substring(3);
+				String response="";
+				if(key.equals("")==false){
+					System.out.println("uri:"+uri);
+					response =  teamId + key.substring(3);
+				}
 				req.response().putHeader("content-type", "text/html; charset=UTF-8").end(response);
 			}
 	
@@ -118,7 +122,8 @@ public class Proxy2 extends AbstractVerticle {
 	 */
 	private int getDnsNum(String uri, int count) {
 		int dnsNum = count;
-		if (uri.indexOf("q6") != -1) {
+		if (uri.indexOf("/q6?") != -1) {
+			System.out.println("This is uri:^^^^^^^^^"+uri+","+uri.indexOf("q6"));
 			// q6 judge
 			int opts = uri.indexOf("opt=s");
 			int opte = uri.indexOf("opt=e");
@@ -137,11 +142,11 @@ public class Proxy2 extends AbstractVerticle {
 				// means opts or opte
 				dnsNum = 100;
 			}
-		} else if (uri.indexOf("q5") != -1) {
+		} else if (uri.indexOf("/q5?") != -1) {
 			// q5 request
 			dnsNum = q5host;
-		}else if(uri.indexOf("q2") == -1 && uri.indexOf("q3") == -1
-				&& uri.indexOf("q4") == -1) {
+		}else if(uri.indexOf("/q2?") == -1 && uri.indexOf("/q3?") == -1
+				&& uri.indexOf("/q4?") == -1) {
 			// means illegal request
 			dnsNum = 50;
 		} else {
