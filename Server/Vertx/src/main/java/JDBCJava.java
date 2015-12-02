@@ -444,5 +444,3 @@ class MyRequest implements Comparable<MyRequest> {
 		return seq - o.seq;
 	}
 }
-
-
