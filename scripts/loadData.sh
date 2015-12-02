@@ -62,7 +62,6 @@ sudo mysql --local-infile -uroot -p123456 mydb -e "use mydb" -e "
         echo "$f finish" 
 done
 
-
 echo finishQ5
 
 
