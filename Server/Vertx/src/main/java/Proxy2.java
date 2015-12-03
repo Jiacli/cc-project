@@ -35,8 +35,8 @@ public class Proxy2 extends AbstractVerticle {
 	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	Calendar cal = Calendar.getInstance();
 	HashMap<String, Integer> KeyStore1 = new HashMap<String, Integer>();
-	private static final int hostnum = 10;
-	private static final int q5host = 10;
+	private static final int hostnum = 5;
+	private static final int q5host = 5;
 	private static String[] DNS = new String[hostnum+1];
 	private int count = 0;
 	
@@ -45,19 +45,12 @@ public class Proxy2 extends AbstractVerticle {
 		System.out.println("*********** start **************");
 		jdbc = new JDBCJava();
 		HttpClient client = vertx.createHttpClient(new HttpClientOptions());
-		DNS[0] = "ec2-54-84-179-42.compute-1.amazonaws.com";
-		DNS[1] = "ec2-54-152-19-185.compute-1.amazonaws.com";
-		DNS[2] = "ec2-54-173-184-45.compute-1.amazonaws.com";
-		DNS[3] = "ec2-54-172-141-42.compute-1.amazonaws.com";
-		DNS[4] = "ec2-54-85-183-235.compute-1.amazonaws.com";
-		DNS[5] = "ec2-54-86-72-252.compute-1.amazonaws.com";
-		DNS[6] = "ec2-52-90-220-245.compute-1.amazonaws.com";
-		DNS[7] = "ec2-54-85-207-18.compute-1.amazonaws.com";
-		DNS[8] = "ec2-52-91-14-239.compute-1.amazonaws.com";
-		DNS[9] = "ec2-54-172-186-84.compute-1.amazonaws.com";
-		
-		//q5 host
-		DNS[10] = "ec2-52-91-70-44.compute-1.amazonaws.com";
+		DNS[0] = "ec2-54-164-124-221.compute-1.amazonaws.com";		
+		DNS[1] = "ec2-52-91-86-72.compute-1.amazonaws.com";		
+		DNS[2] = "ec2-52-90-198-175.compute-1.amazonaws.com";	
+		DNS[3] = "ec2-54-165-233-36.compute-1.amazonaws.com";		
+		DNS[4] = "ec2-54-175-107-104.compute-1.amazonaws.com";
+		DNS[5] = "ec2-54-152-245-66.compute-1.amazonaws.com";
 
 		// connection
 		HttpServer server = vertx.createHttpServer();
@@ -183,14 +176,9 @@ public class Proxy2 extends AbstractVerticle {
 
 			String xy = input.substring(keyIndex + 4, index);
 			int Z;
-//			if (KeyStore1.containsKey(xy)) {
-//				Z = KeyStore1.get(xy);
-//			} else {
-				BigInteger XY = new BigInteger(xy);
-				String Y = XY.divide(X).toString();
-				Z = Integer.valueOf(Y.substring(Y.length() - 2)) % 25 + 1;
-//				KeyStore1.put(xy, Z);
-//			}
+			BigInteger XY = new BigInteger(xy);
+			String Y = XY.divide(X).toString();
+			Z = Integer.valueOf(Y.substring(Y.length() - 2)) % 25 + 1;
 			message = getText(message, n);
 			message = moveBit(message, Z);
 			return "q1," + put + message + "\n";
@@ -246,117 +234,5 @@ public class Proxy2 extends AbstractVerticle {
 		return builder.toString();
 	}
 
-	public static UserCountList initializeQ5(String filename) {
-		UserCountList list = new UserCountList();
-
-		// round 2: read score list
-		BufferedReader reader = null;
-		long uid;
-		int sum;
-		int count = 0;
-		String line;
-		try {
-			reader = new BufferedReader(new FileReader(new File(filename)));
-
-			while ((line = reader.readLine()) != null) {
-				count++;
-				if (count % 5000000 == 0) {
-					System.out.print(count / 5000000 + " ");
-				}
-				String[] seg = line.split("\t");
-				if (seg.length != 3)
-					continue;
-				uid = Long.parseLong(seg[0]);
-				sum = Integer.parseInt(seg[1]);
-				list.add(uid, sum);
-			}
-			reader.close();
-		} catch (Exception e) {
-			System.out.print("Loading q5 file failed.");
-		}
-
-		System.out.println("\nQ5: " + count + " loaded! (should be 53767998)");
-		return list;
-	}
 }
 
-class UserCountList {
-	// maxID 2594997268
-	// minID 12
-	// -2147483648 ~ 2147483647
-	private int[] id = null;
-	private int[] count = null;
-	private int size = 0;
-	private static final int TOTAL = 53767998 + 1;
-	private static final long MINID = 12;
-	private static final long MAXID = 2594997268L;
-	private final int UID_SHIFT = 1000000000;
-
-	public UserCountList() {
-		id = new int[TOTAL];
-		count = new int[TOTAL];
-		id[0] = 0;
-		count[0] = 0;
-		size++;
-	}
-
-	public void add(long uid, int sum) {
-		int newid = (int) (uid - UID_SHIFT);
-		id[size] = newid;
-		count[size] = sum;
-		size++;
-	}
-
-	private int binSearchUidLeft(int[] array, int target, int beginPos,
-			int endPos) {
-		// [...)
-		while (1 < endPos - beginPos) {
-			int mid = (beginPos + endPos) / 2;
-			if (target < array[mid]) {
-				endPos = mid;
-			} else {
-				beginPos = mid;
-			}
-		}
-		if (target == array[beginPos]) {
-			return beginPos - 1;
-		} else {
-			return beginPos;
-		}
-
-	}
-
-	private int binSearchUid(int[] array, int target, int beginPos, int endPos) {
-		// [...)
-		while (1 < endPos - beginPos) {
-			int mid = (beginPos + endPos) / 2;
-			if (target < array[mid]) {
-				endPos = mid;
-			} else {
-				beginPos = mid;
-			}
-		}
-		return beginPos;
-	}
-
-	public int getCount(String q5str) {
-		String[] seg = q5str.split(",");
-
-		long left = Long.parseLong(seg[1]);
-		long right = Long.parseLong(seg[2]);
-
-		return search(left, right);
-	}
-
-	private int search(long left, long right) {
-		if (left < MINID) {
-			left = MINID;
-		}
-		if (right > MAXID) {
-			right = MAXID;
-		}
-		int leftpos = binSearchUidLeft(id, (int) (left - UID_SHIFT), 1, TOTAL);
-		int rightpos = binSearchUid(id, (int) (right - UID_SHIFT), 1, TOTAL);
-		return count[rightpos] - count[leftpos];
-	}
-}
